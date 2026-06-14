@@ -24,7 +24,6 @@ async function startup({ id, version, rootURI }) {
 	Zotero.PreferencePanes.register({
 		pluginID: "zotero-expand@vandemathieu",
 		src: rootURI + "preferences/preferences.xhtml",
-		scripts: [rootURI + "preferences/preferences.js"],
 		label: "Zotero Expand",
 	});
 }
