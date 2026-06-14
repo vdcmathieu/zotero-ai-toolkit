@@ -1,0 +1,176 @@
+<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+      xmlns:html="http://www.w3.org/1999/xhtml"
+      id="ai-summarizer-prefs-pane">
+
+	<groupbox>
+		<label><html:h2>Provider &amp; API Keys</html:h2></label>
+
+		<hbox align="center">
+			<label value="Provider:" style="min-width: 12em;"/>
+			<menulist id="ai-summarizer-provider" native="true"
+			          preference="extensions.zotero.aisummarizer.provider">
+				<menupopup>
+					<menuitem label="Anthropic (Claude)" value="anthropic"/>
+					<menuitem label="OpenAI (ChatGPT)" value="openai"/>
+				</menupopup>
+			</menulist>
+		</hbox>
+
+		<hbox align="center">
+			<label value="Anthropic API key:" style="min-width: 12em;"/>
+			<html:input type="password" id="ai-summarizer-anthropic-key"
+			            style="width: 28em;" placeholder="sk-ant-…"
+			            preference="extensions.zotero.aisummarizer.anthropicApiKey"/>
+		</hbox>
+
+		<hbox align="center">
+			<label value="OpenAI API key:" style="min-width: 12em;"/>
+			<html:input type="password" id="ai-summarizer-openai-key"
+			            style="width: 28em;" placeholder="sk-…"
+			            preference="extensions.zotero.aisummarizer.openaiApiKey"/>
+		</hbox>
+
+		<hbox align="center">
+			<html:button id="ai-summarizer-test-key">Test API key</html:button>
+			<description id="ai-summarizer-test-result" style="margin-left: 1em;"/>
+		</hbox>
+
+		<description style="opacity: 0.7;">
+			Keys are stored unencrypted in your Zotero profile on this computer and are only
+			ever sent to the selected provider over HTTPS. Article text is sent to the provider
+			only when you explicitly run a summarization.
+		</description>
+	</groupbox>
+
+	<groupbox>
+		<label><html:h2>Models</html:h2></label>
+
+		<hbox align="center">
+			<label value="Claude model:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-summarizer-anthropic-model"
+			            style="width: 20em;" list="ai-summarizer-anthropic-models"
+			            preference="extensions.zotero.aisummarizer.anthropicModel"/>
+			<html:datalist id="ai-summarizer-anthropic-models">
+				<html:option value="claude-opus-4-8"/>
+				<html:option value="claude-sonnet-4-6"/>
+				<html:option value="claude-haiku-4-5"/>
+			</html:datalist>
+		</hbox>
+
+		<hbox align="center">
+			<label value="ChatGPT model:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-summarizer-openai-model"
+			            style="width: 20em;" list="ai-summarizer-openai-models"
+			            preference="extensions.zotero.aisummarizer.openaiModel"/>
+			<html:datalist id="ai-summarizer-openai-models">
+				<html:option value="gpt-5"/>
+				<html:option value="gpt-5-mini"/>
+				<html:option value="gpt-4o"/>
+			</html:datalist>
+		</hbox>
+
+		<description style="opacity: 0.7;">
+			Any model ID accepted by the provider's API can be entered.
+			claude-opus-4-8 gives the highest-quality summaries; claude-sonnet-4-6 and
+			claude-haiku-4-5 are faster and cheaper.
+		</description>
+	</groupbox>
+
+	<groupbox>
+		<label><html:h2>Summary Options</html:h2></label>
+
+		<hbox align="center">
+			<label value="Output language:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-summarizer-language" style="width: 12em;"
+			            preference="extensions.zotero.aisummarizer.outputLanguage"/>
+		</hbox>
+
+		<hbox align="center">
+			<label value="Max output tokens:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-summarizer-max-tokens" style="width: 8em;"
+			            preference="extensions.zotero.aisummarizer.maxOutputTokens"/>
+		</hbox>
+
+		<hbox align="center">
+			<label value="Max input characters:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-summarizer-max-chars" style="width: 8em;"
+			            preference="extensions.zotero.aisummarizer.maxInputChars"/>
+			<label value="(longer articles are truncated)" style="opacity: 0.7;"/>
+		</hbox>
+
+		<vbox>
+			<label value="Custom prompt template (leave empty to use the built-in template; {language} is replaced automatically):"/>
+			<html:textarea id="ai-summarizer-prompt" rows="8" style="width: 95%; font-family: monospace; font-size: 0.9em;"
+			               preference="extensions.zotero.aisummarizer.promptTemplate"/>
+			<hbox>
+				<html:button id="ai-summarizer-load-default-prompt">Load built-in template into editor</html:button>
+				<html:button id="ai-summarizer-clear-prompt">Reset to built-in</html:button>
+			</hbox>
+		</vbox>
+	</groupbox>
+
+	<groupbox>
+		<label><html:h2>Highlight Categorization</html:h2></label>
+
+		<description style="opacity: 0.7;">
+			Workflow: highlight everything in one color (e.g. blue) while reading, then run
+			“Categorize Highlights with AI” — each highlight is recolored to its category color,
+			the same taxonomy across all articles. Blue is reserved: it never appears in the
+			taxonomy, so blue always means “not yet categorized”.
+		</description>
+
+		<vbox>
+			<label value="Categories — one per line: #color | Name | what belongs there (leave empty for built-in taxonomy):"/>
+			<html:textarea id="ai-summarizer-categories" rows="8" style="width: 95%; font-family: monospace; font-size: 0.9em;"
+			               preference="extensions.zotero.aisummarizer.categories"/>
+			<hbox>
+				<html:button id="ai-summarizer-load-default-categories">Load built-in taxonomy into editor</html:button>
+				<html:button id="ai-summarizer-clear-categories">Reset to built-in</html:button>
+			</hbox>
+		</vbox>
+
+		<hbox align="center">
+			<checkbox id="ai-summarizer-digest" native="true"
+			          label="Create a digest note grouping highlights by category"
+			          preference="extensions.zotero.aisummarizer.createDigestNote"/>
+		</hbox>
+		<hbox align="center">
+			<checkbox id="ai-summarizer-tag-annotations" native="true"
+			          label="Tag each highlight with its category name"
+			          preference="extensions.zotero.aisummarizer.tagAnnotations"/>
+		</hbox>
+	</groupbox>
+
+	<groupbox>
+		<label><html:h2>Keyboard Shortcut</html:h2></label>
+
+		<hbox align="center">
+			<checkbox id="ai-summarizer-shortcut-enabled" native="true" label="Enable keyboard shortcut"
+			          preference="extensions.zotero.aisummarizer.shortcutEnabled"/>
+		</hbox>
+
+		<hbox align="center">
+			<checkbox id="ai-summarizer-shortcut-accel" native="true" label="Cmd/Ctrl"
+			          preference="extensions.zotero.aisummarizer.shortcutAccel"/>
+			<checkbox id="ai-summarizer-shortcut-shift" native="true" label="Shift"
+			          preference="extensions.zotero.aisummarizer.shortcutShift"/>
+			<checkbox id="ai-summarizer-shortcut-alt" native="true" label="Alt/Option"
+			          preference="extensions.zotero.aisummarizer.shortcutAlt"/>
+			<label value="+ summarize key:"/>
+			<html:input type="text" id="ai-summarizer-shortcut-key" maxlength="1"
+			            style="width: 3em; text-align: center;"
+			            preference="extensions.zotero.aisummarizer.shortcutKey"/>
+			<label value="+ categorize key:"/>
+			<html:input type="text" id="ai-summarizer-categorize-key" maxlength="1"
+			            style="width: 3em; text-align: center;"
+			            preference="extensions.zotero.aisummarizer.categorizeShortcutKey"/>
+		</hbox>
+
+		<description style="opacity: 0.7;">
+			Defaults: Cmd/Ctrl + Shift + S to summarize, Cmd/Ctrl + Shift + H to categorize
+			highlights, with one or more items selected in the library. Both actions are also
+			available by right-clicking selected items. The two keys must be different.
+		</description>
+	</groupbox>
+
+</vbox>

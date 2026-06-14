@@ -1,0 +1,15 @@
+{
+	"manifest_version": 2,
+	"name": "AI Paper Summarizer",
+	"version": "1.1.0",
+	"description": "Summarize selected articles with Claude or ChatGPT and save structured notes in Zotero",
+	"author": "Mathieu Vandecatsije",
+	"applications": {
+		"zotero": {
+			"id": "ai-summarizer@zotero-summary",
+			"update_url": "https://example.com/zotero-ai-summarizer/updates.json",
+			"strict_min_version": "6.999",
+			"strict_max_version": "9.*"
+		}
+	}
+}

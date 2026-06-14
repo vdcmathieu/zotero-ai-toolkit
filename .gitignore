@@ -1,0 +1,9 @@
+# macOS
+.DS_Store
+
+# Build artifacts
+*.xpi
+
+# Local Claude Code settings & logs
+.claude/settings.local.json
+conversation-logs-*.jsonl
