@@ -29,7 +29,7 @@ you pick. API usage is billed by that provider.
 ## Install
 
 1. Download `zotero-expand.xpi` from the
-   [Releases](https://github.com/vandemathieu/zotero-expand/releases) page
+   [Releases](https://github.com/vdcmathieu/zotero-expand/releases) page
    (or run `./build.sh` to create it from source).
 2. In Zotero: **Tools → Plugins → gear icon → Install Plugin From File…** and
    select the `.xpi`.
