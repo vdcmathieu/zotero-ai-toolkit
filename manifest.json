@@ -1,0 +1,16 @@
+{
+  "manifest_version": 2,
+  "name": "Zotero Expand",
+  "version": "1.0.0",
+  "description": "Reads a selected article (text + bibliography) and uses Claude or GPT, with web search, to recommend further reading on the same topic.",
+  "author": "Mathieu Vandecatsije",
+  "homepage_url": "https://github.com/vandemathieu/zotero-expand",
+  "applications": {
+    "zotero": {
+      "id": "zotero-expand@vandemathieu",
+      "update_url": "https://raw.githubusercontent.com/vandemathieu/zotero-expand/main/updates.json",
+      "strict_min_version": "6.999",
+      "strict_max_version": "8.*"
+    }
+  }
+}

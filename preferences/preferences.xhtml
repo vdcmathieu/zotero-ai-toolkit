@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+      xmlns:html="http://www.w3.org/1999/xhtml">
+	<groupbox>
+		<label><html:h2>Zotero Expand</html:h2></label>
+
+		<html:p style="max-width: 40em;">
+			Select an article in your library, right-click it, and choose
+			<b>“Find further reading (AI)”</b>. The recommendations are saved as a
+			child note on the item.
+		</html:p>
+
+		<grid>
+			<columns>
+				<column/>
+				<column flex="1"/>
+			</columns>
+			<rows>
+				<row align="center">
+					<label value="AI provider"/>
+					<menulist id="ze-provider" native="true">
+						<menupopup>
+							<menuitem label="Claude (Anthropic) — recommended" value="claude"/>
+							<menuitem label="OpenAI (GPT)" value="openai"/>
+						</menupopup>
+					</menulist>
+				</row>
+				<row align="center">
+					<label value="API key"/>
+					<html:input id="ze-apikey" type="password" style="width: 30em;"
+						placeholder="sk-..."/>
+				</row>
+				<row align="center">
+					<label value="Model (optional)"/>
+					<html:input id="ze-model" type="text" style="width: 30em;"
+						placeholder="leave blank for the recommended default"/>
+				</row>
+				<row align="center">
+					<label value="Number of recommendations"/>
+					<html:input id="ze-count" type="number" min="1" max="30"
+						style="width: 6em;"/>
+				</row>
+			</rows>
+		</grid>
+
+		<html:p style="max-width: 40em; opacity: 0.8;">
+			Defaults: <code>claude-opus-4-8</code> for Claude, <code>gpt-4o</code> for
+			OpenAI. Both providers use web search to find and verify sources. Your key
+			is stored locally in Zotero's preferences and sent only to the provider you
+			choose.
+		</html:p>
+	</groupbox>
+</vbox>
