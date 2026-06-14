@@ -48,7 +48,7 @@ get details wrong.
 | --- | --- | --- |
 | Provider | Claude | Claude (Anthropic) or OpenAI |
 | API key | — | Stored locally |
-| Model | provider default | `claude-opus-4-8` / `gpt-4o`; override if you like |
+| Model | provider default | `claude-opus-4-8` / `gpt-5.4-nano`; override if you like |
 | Number of recommendations | 8 | 1–30 |
 
 ## How it works

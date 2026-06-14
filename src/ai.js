@@ -7,7 +7,7 @@
 ZoteroExpandAI = {
 	DEFAULT_MODELS: {
 		claude: "claude-opus-4-8",
-		openai: "gpt-4o",
+		openai: "gpt-5.4-nano",
 	},
 
 	/**
