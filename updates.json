@@ -1,0 +1,18 @@
+{
+  "addons": {
+    "zotero-ai-toolkit@vandemathieu": {
+      "updates": [
+        {
+          "version": "1.2.0",
+          "update_link": "https://github.com/vdcmathieu/zotero-ai-toolkit/releases/download/v1.2.0/zotero-ai-toolkit.xpi",
+          "applications": {
+            "zotero": {
+              "strict_min_version": "6.999",
+              "strict_max_version": "9.*"
+            }
+          }
+        }
+      ]
+    }
+  }
+}
