@@ -165,12 +165,16 @@ Be faithful to the text. If something is not stated in the article, say so inste
 		let pressed = event.key.toLowerCase();
 		let summarizeKey = (this.getPref("shortcutKey") || "S").toLowerCase();
 		let categorizeKey = (this.getPref("categorizeShortcutKey") || "H").toLowerCase();
+		let sortKey = (this.getPref("sortShortcutKey") || "F").toLowerCase();
 		let action = null;
 		if (pressed === summarizeKey) {
 			action = "summarize";
 		}
 		else if (pressed === categorizeKey) {
 			action = "categorize";
+		}
+		else if (pressed === sortKey) {
+			action = "sort";
 		}
 		if (!action) {
 			return;
@@ -194,6 +198,12 @@ Be faithful to the text. If something is not stated in the article, say so inste
 		event.stopPropagation();
 		if (action === "categorize") {
 			this.categorizeSelected(window);
+		}
+		else if (action === "sort") {
+			// ZoteroSort lives in the same bootstrap scope (loaded by bootstrap.js).
+			if (typeof ZoteroSort !== "undefined" && ZoteroSort) {
+				ZoteroSort.run(window);
+			}
 		}
 		else {
 			this.summarizeSelected(window);

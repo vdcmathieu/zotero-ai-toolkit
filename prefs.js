@@ -13,6 +13,7 @@ pref("extensions.zotero-ai-toolkit.openaiApiKey", "");
 pref("extensions.zotero-ai-toolkit.summarizeModel", "claude-sonnet-4-6");
 pref("extensions.zotero-ai-toolkit.categorizeModel", "claude-haiku-4-5");
 pref("extensions.zotero-ai-toolkit.expandModel", "claude-opus-4-8");
+pref("extensions.zotero-ai-toolkit.sortModel", "claude-sonnet-4-6");
 
 // --- Summarize ------------------------------------------------------------
 pref("extensions.zotero-ai-toolkit.maxOutputTokens", "16000");
@@ -36,3 +37,4 @@ pref("extensions.zotero-ai-toolkit.shortcutShift", true);
 pref("extensions.zotero-ai-toolkit.shortcutAlt", false);
 pref("extensions.zotero-ai-toolkit.shortcutKey", "S");
 pref("extensions.zotero-ai-toolkit.categorizeShortcutKey", "H");
+pref("extensions.zotero-ai-toolkit.sortShortcutKey", "F");
