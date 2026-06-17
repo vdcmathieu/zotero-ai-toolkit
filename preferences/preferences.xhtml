@@ -1,52 +1,204 @@
 <vbox xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
       xmlns:html="http://www.w3.org/1999/xhtml"
-      id="zotero-expand-prefs-pane">
+      id="zotero-ai-toolkit-prefs-pane">
 
 	<groupbox>
-		<label><html:h2>Zotero Expand</html:h2></label>
+		<label><html:h2>Provider &amp; API Keys</html:h2></label>
 
-		<description style="max-width: 40em;">
-			Select an article in your library, right-click it, and choose
-			“Find further reading (AI)”. The recommendations are saved as a child
-			note on the item.
+		<description style="opacity: 0.8; max-width: 44em;">
+			These credentials are shared by every tool in the kit — Summarize,
+			Categorize Highlights, and Find Further Reading.
 		</description>
 
 		<hbox align="center">
-			<label value="AI provider:" style="min-width: 14em;"/>
-			<menulist id="ze-provider" native="true"
-			          preference="extensions.zotero-expand.provider">
+			<label value="Provider:" style="min-width: 12em;"/>
+			<menulist id="ai-toolkit-provider" native="true"
+			          preference="extensions.zotero-ai-toolkit.provider">
 				<menupopup>
-					<menuitem label="Claude (Anthropic) — recommended" value="claude"/>
-					<menuitem label="OpenAI (GPT)" value="openai"/>
+					<menuitem label="Anthropic (Claude)" value="anthropic"/>
+					<menuitem label="OpenAI (ChatGPT)" value="openai"/>
 				</menupopup>
 			</menulist>
 		</hbox>
 
 		<hbox align="center">
-			<label value="API key:" style="min-width: 14em;"/>
-			<html:input type="password" id="ze-apikey" style="width: 30em;"
-			            placeholder="sk-…"
-			            preference="extensions.zotero-expand.apiKey"/>
+			<label value="Anthropic API key:" style="min-width: 12em;"/>
+			<html:input type="password" id="ai-toolkit-anthropic-key"
+			            style="width: 28em;" placeholder="sk-ant-…"
+			            preference="extensions.zotero-ai-toolkit.anthropicApiKey"/>
 		</hbox>
 
 		<hbox align="center">
-			<label value="Model (optional):" style="min-width: 14em;"/>
-			<html:input type="text" id="ze-model" style="width: 30em;"
-			            placeholder="leave blank for the recommended default"
-			            preference="extensions.zotero-expand.model"/>
+			<label value="OpenAI API key:" style="min-width: 12em;"/>
+			<html:input type="password" id="ai-toolkit-openai-key"
+			            style="width: 28em;" placeholder="sk-…"
+			            preference="extensions.zotero-ai-toolkit.openaiApiKey"/>
 		</hbox>
 
 		<hbox align="center">
-			<label value="Number of recommendations:" style="min-width: 14em;"/>
-			<html:input type="number" min="1" max="30" id="ze-count"
+			<html:button id="ai-toolkit-test-key">Test API key</html:button>
+			<description id="ai-toolkit-test-result" style="margin-left: 1em;"/>
+		</hbox>
+
+		<description style="opacity: 0.7;">
+			Keys are stored unencrypted in your Zotero profile on this computer and are only
+			ever sent to the selected provider over HTTPS. Article text is sent to the provider
+			only when you explicitly run a command.
+		</description>
+	</groupbox>
+
+	<groupbox>
+		<label><html:h2>Models</html:h2></label>
+
+		<hbox align="center">
+			<label value="Claude model:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-toolkit-anthropic-model"
+			            style="width: 20em;" list="ai-toolkit-anthropic-models"
+			            preference="extensions.zotero-ai-toolkit.anthropicModel"/>
+			<html:datalist id="ai-toolkit-anthropic-models">
+				<html:option value="claude-opus-4-8"/>
+				<html:option value="claude-sonnet-4-6"/>
+				<html:option value="claude-haiku-4-5"/>
+			</html:datalist>
+		</hbox>
+
+		<hbox align="center">
+			<label value="ChatGPT model:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-toolkit-openai-model"
+			            style="width: 20em;" list="ai-toolkit-openai-models"
+			            preference="extensions.zotero-ai-toolkit.openaiModel"/>
+			<html:datalist id="ai-toolkit-openai-models">
+				<html:option value="gpt-5"/>
+				<html:option value="gpt-5-mini"/>
+				<html:option value="gpt-5.4-nano"/>
+				<html:option value="gpt-4o"/>
+			</html:datalist>
+		</hbox>
+
+		<description style="opacity: 0.7;">
+			Any model ID accepted by the provider's API can be entered.
+			claude-opus-4-8 gives the highest-quality output; claude-sonnet-4-6 and
+			claude-haiku-4-5 are faster and cheaper.
+		</description>
+	</groupbox>
+
+	<groupbox>
+		<label><html:h2>Summarize</html:h2></label>
+
+		<hbox align="center">
+			<label value="Output language:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-toolkit-language" style="width: 12em;"
+			            preference="extensions.zotero-ai-toolkit.outputLanguage"/>
+		</hbox>
+
+		<hbox align="center">
+			<label value="Max output tokens:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-toolkit-max-tokens" style="width: 8em;"
+			            preference="extensions.zotero-ai-toolkit.maxOutputTokens"/>
+		</hbox>
+
+		<hbox align="center">
+			<label value="Max input characters:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-toolkit-max-chars" style="width: 8em;"
+			            preference="extensions.zotero-ai-toolkit.maxInputChars"/>
+			<label value="(longer articles are truncated)" style="opacity: 0.7;"/>
+		</hbox>
+
+		<vbox>
+			<label value="Custom prompt template (leave empty to use the built-in template; {language} is replaced automatically):"/>
+			<html:textarea id="ai-toolkit-prompt" rows="8" style="width: 95%; font-family: monospace; font-size: 0.9em;"
+			               preference="extensions.zotero-ai-toolkit.promptTemplate"/>
+			<hbox>
+				<html:button id="ai-toolkit-load-default-prompt">Load built-in template into editor</html:button>
+				<html:button id="ai-toolkit-clear-prompt">Reset to built-in</html:button>
+			</hbox>
+		</vbox>
+	</groupbox>
+
+	<groupbox>
+		<label><html:h2>Highlight Categorization</html:h2></label>
+
+		<description style="opacity: 0.7;">
+			Workflow: highlight everything in one color (e.g. blue) while reading, then run
+			“Categorize Highlights with AI” — each highlight is recolored to its category color,
+			the same taxonomy across all articles. Blue is reserved: it never appears in the
+			taxonomy, so blue always means “not yet categorized”.
+		</description>
+
+		<vbox>
+			<label value="Categories — one per line: #color | Name | what belongs there (leave empty for built-in taxonomy):"/>
+			<html:textarea id="ai-toolkit-categories" rows="8" style="width: 95%; font-family: monospace; font-size: 0.9em;"
+			               preference="extensions.zotero-ai-toolkit.categories"/>
+			<hbox>
+				<html:button id="ai-toolkit-load-default-categories">Load built-in taxonomy into editor</html:button>
+				<html:button id="ai-toolkit-clear-categories">Reset to built-in</html:button>
+			</hbox>
+		</vbox>
+
+		<hbox align="center">
+			<checkbox id="ai-toolkit-digest" native="true"
+			          label="Create a digest note grouping highlights by category"
+			          preference="extensions.zotero-ai-toolkit.createDigestNote"/>
+		</hbox>
+		<hbox align="center">
+			<checkbox id="ai-toolkit-tag-annotations" native="true"
+			          label="Tag each highlight with its category name"
+			          preference="extensions.zotero-ai-toolkit.tagAnnotations"/>
+		</hbox>
+	</groupbox>
+
+	<groupbox>
+		<label><html:h2>Find Further Reading</html:h2></label>
+
+		<description style="opacity: 0.7;">
+			Right-click an article → “Find further reading (AI)”. The model reads the paper and
+			its bibliography, searches the web, and saves a child note of recommended sources.
+		</description>
+
+		<hbox align="center">
+			<label value="Number of recommendations:" style="min-width: 12em;"/>
+			<html:input type="number" min="1" max="30" id="ai-toolkit-rec-count"
 			            style="width: 6em;"
-			            preference="extensions.zotero-expand.numRecommendations"/>
+			            preference="extensions.zotero-ai-toolkit.numRecommendations"/>
 		</hbox>
 
-		<description style="max-width: 40em; opacity: 0.8;">
-			Defaults: claude-opus-4-8 for Claude, gpt-5.4-nano for OpenAI. Both
-			providers use web search to find and verify sources. Your key is stored
-			locally in Zotero's preferences and sent only to the provider you choose.
+		<hbox align="center">
+			<label value="Max input characters:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-toolkit-rec-max-chars" style="width: 8em;"
+			            preference="extensions.zotero-ai-toolkit.maxChars"/>
+			<label value="(article text sent to the model)" style="opacity: 0.7;"/>
+		</hbox>
+	</groupbox>
+
+	<groupbox>
+		<label><html:h2>Keyboard Shortcuts</html:h2></label>
+
+		<hbox align="center">
+			<checkbox id="ai-toolkit-shortcut-enabled" native="true" label="Enable keyboard shortcuts"
+			          preference="extensions.zotero-ai-toolkit.shortcutEnabled"/>
+		</hbox>
+
+		<hbox align="center">
+			<checkbox id="ai-toolkit-shortcut-accel" native="true" label="Cmd/Ctrl"
+			          preference="extensions.zotero-ai-toolkit.shortcutAccel"/>
+			<checkbox id="ai-toolkit-shortcut-shift" native="true" label="Shift"
+			          preference="extensions.zotero-ai-toolkit.shortcutShift"/>
+			<checkbox id="ai-toolkit-shortcut-alt" native="true" label="Alt/Option"
+			          preference="extensions.zotero-ai-toolkit.shortcutAlt"/>
+			<label value="+ summarize key:"/>
+			<html:input type="text" id="ai-toolkit-shortcut-key" maxlength="1"
+			            style="width: 3em; text-align: center;"
+			            preference="extensions.zotero-ai-toolkit.shortcutKey"/>
+			<label value="+ categorize key:"/>
+			<html:input type="text" id="ai-toolkit-categorize-key" maxlength="1"
+			            style="width: 3em; text-align: center;"
+			            preference="extensions.zotero-ai-toolkit.categorizeShortcutKey"/>
+		</hbox>
+
+		<description style="opacity: 0.7;">
+			Defaults: Cmd/Ctrl + Shift + S to summarize, Cmd/Ctrl + Shift + H to categorize
+			highlights, with one or more items selected in the library. Both actions are also
+			available by right-clicking selected items. The two keys must be different.
 		</description>
 	</groupbox>
 

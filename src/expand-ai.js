@@ -1,13 +1,13 @@
 /* eslint-disable no-undef */
-// AI clients for Zotero Expand.
+// AI client for the "Find further reading" feature.
 // Talks to Claude (Anthropic) or OpenAI directly over HTTPS using Zotero.HTTP,
 // asking the model to read an article + its bibliography and use web search to
 // recommend further reading. Returns a structured object.
 
 ZoteroExpandAI = {
 	DEFAULT_MODELS: {
-		claude: "claude-opus-4-8",
-		openai: "gpt-5.4-nano",
+		anthropic: "claude-opus-4-8",
+		openai: "gpt-5",
 	},
 
 	/**
@@ -15,7 +15,7 @@ ZoteroExpandAI = {
 	 * @returns {Promise<Object>} {summary, topics, recommendations:[...]}
 	 */
 	async recommend(opts) {
-		const provider = opts.provider || "claude";
+		const provider = opts.provider === "openai" ? "openai" : "anthropic";
 		const model = opts.model || this.DEFAULT_MODELS[provider];
 		const prompt = this.buildPrompt(opts.articleText, opts.meta, opts.count);
 

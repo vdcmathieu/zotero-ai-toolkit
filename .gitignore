@@ -1,4 +1,11 @@
-*.xpi
+# macOS
 .DS_Store
+
+# Build artifacts
+*.xpi
 build/
 node_modules/
+
+# Local Claude Code settings & logs
+.claude/settings.local.json
+conversation-logs-*.jsonl

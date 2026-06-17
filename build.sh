@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# Build zotero-expand.xpi from the plugin source.
+# Build zotero-ai-toolkit.xpi from the plugin source.
+# A Zotero plugin is just a zip of the plugin root.
 set -euo pipefail
 cd "$(dirname "$0")"
 
-OUT="zotero-expand.xpi"
+OUT="zotero-ai-toolkit.xpi"
 rm -f "$OUT"
 
 zip -r -FS "$OUT" \
@@ -12,6 +13,6 @@ zip -r -FS "$OUT" \
 	prefs.js \
 	src \
 	preferences \
-	-x '*.DS_Store'
+	-x '*.DS_Store' > /dev/null
 
 echo "Built $OUT"
