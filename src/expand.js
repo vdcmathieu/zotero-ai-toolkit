@@ -23,17 +23,18 @@ ZoteroExpand = {
 		return Zotero.Prefs.get(this.PREFIX + key, true);
 	},
 
-	getProvider() {
-		return this.getPref("provider") === "openai" ? "openai" : "anthropic";
+	// The chosen model decides the provider and which API key is used.
+	getModel() {
+		return (this.getPref("expandModel") || "claude-opus-4-8").trim();
+	},
+
+	providerForModel(model) {
+		return /^claude/i.test(String(model || "").trim()) ? "anthropic" : "openai";
 	},
 
 	getApiKey(provider) {
 		const key = this.getPref(provider === "openai" ? "openaiApiKey" : "anthropicApiKey");
 		return (key || "").trim();
-	},
-
-	getModel(provider) {
-		return (this.getPref(provider === "openai" ? "openaiModel" : "anthropicModel") || "").trim();
 	},
 
 	providerLabel(provider) {
@@ -73,13 +74,15 @@ ZoteroExpand = {
 	// --- Main flow ---------------------------------------------------------
 
 	async run(window) {
-		const provider = this.getProvider();
+		const model = this.getModel();
+		const provider = this.providerForModel(model);
 		const apiKey = this.getApiKey(provider);
 
 		if (!apiKey) {
 			window.alert(
 				"Zotero AI Toolkit: no API key set.\n\n"
-				+ "Open Settings → AI Toolkit and paste your "
+				+ "Find further reading is set to use " + model + ", so open\n"
+				+ "Settings → AI Toolkit and paste your "
 				+ this.providerLabel(provider)
 				+ " API key."
 			);
@@ -111,7 +114,6 @@ ZoteroExpand = {
 				: articleText;
 
 			const count = parseInt(this.getPref("numRecommendations")) || 8;
-			const model = this.getModel(provider);
 
 			const result = await ZoteroExpandAI.recommend({
 				provider,

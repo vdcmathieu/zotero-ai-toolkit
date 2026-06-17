@@ -1,15 +1,18 @@
 // Default preferences for Zotero AI Toolkit.
 // Zotero loads this file automatically from the plugin root.
 //
-// All features share one provider selection and one pair of API keys/models,
-// so you configure your credentials once and every tool uses them.
+// All features share one pair of API keys (Anthropic + OpenAI). Each tool then
+// picks its own model from a unified list of Claude and GPT models; the
+// provider and which key to use are inferred from the chosen model ID.
 
-// --- Shared: provider, keys, models ---------------------------------------
-pref("extensions.zotero-ai-toolkit.provider", "anthropic");
+// --- Shared: API keys -----------------------------------------------------
 pref("extensions.zotero-ai-toolkit.anthropicApiKey", "");
 pref("extensions.zotero-ai-toolkit.openaiApiKey", "");
-pref("extensions.zotero-ai-toolkit.anthropicModel", "claude-opus-4-8");
-pref("extensions.zotero-ai-toolkit.openaiModel", "gpt-5");
+
+// --- Per-tool model (Claude or GPT; provider inferred from the ID) ---------
+pref("extensions.zotero-ai-toolkit.summarizeModel", "claude-sonnet-4-6");
+pref("extensions.zotero-ai-toolkit.categorizeModel", "claude-haiku-4-5");
+pref("extensions.zotero-ai-toolkit.expandModel", "claude-opus-4-8");
 
 // --- Summarize ------------------------------------------------------------
 pref("extensions.zotero-ai-toolkit.maxOutputTokens", "16000");

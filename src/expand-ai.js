@@ -7,7 +7,7 @@
 ZoteroExpandAI = {
 	DEFAULT_MODELS: {
 		anthropic: "claude-opus-4-8",
-		openai: "gpt-5",
+		openai: "gpt-5.4",
 	},
 
 	/**

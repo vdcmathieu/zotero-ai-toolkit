@@ -3,23 +3,13 @@
       id="zotero-ai-toolkit-prefs-pane">
 
 	<groupbox>
-		<label><html:h2>Provider &amp; API Keys</html:h2></label>
+		<label><html:h2>API Keys</html:h2></label>
 
 		<description style="opacity: 0.8; max-width: 44em;">
-			These credentials are shared by every tool in the kit — Summarize,
-			Categorize Highlights, and Find Further Reading.
+			Store one or both keys. Each tool below picks its own model from a
+			combined Claude + GPT list; the key used is the one for whichever
+			provider that model belongs to.
 		</description>
-
-		<hbox align="center">
-			<label value="Provider:" style="min-width: 12em;"/>
-			<menulist id="ai-toolkit-provider" native="true"
-			          preference="extensions.zotero-ai-toolkit.provider">
-				<menupopup>
-					<menuitem label="Anthropic (Claude)" value="anthropic"/>
-					<menuitem label="OpenAI (ChatGPT)" value="openai"/>
-				</menupopup>
-			</menulist>
-		</hbox>
 
 		<hbox align="center">
 			<label value="Anthropic API key:" style="min-width: 12em;"/>
@@ -36,54 +26,38 @@
 		</hbox>
 
 		<hbox align="center">
-			<html:button id="ai-toolkit-test-key">Test API key</html:button>
+			<html:button id="ai-toolkit-test-key">Test API key(s)</html:button>
 			<description id="ai-toolkit-test-result" style="margin-left: 1em;"/>
 		</hbox>
 
 		<description style="opacity: 0.7;">
 			Keys are stored unencrypted in your Zotero profile on this computer and are only
-			ever sent to the selected provider over HTTPS. Article text is sent to the provider
+			ever sent to the matching provider over HTTPS. Article text is sent to the provider
 			only when you explicitly run a command.
 		</description>
 	</groupbox>
 
 	<groupbox>
-		<label><html:h2>Models</html:h2></label>
-
-		<hbox align="center">
-			<label value="Claude model:" style="min-width: 12em;"/>
-			<html:input type="text" id="ai-toolkit-anthropic-model"
-			            style="width: 20em;" list="ai-toolkit-anthropic-models"
-			            preference="extensions.zotero-ai-toolkit.anthropicModel"/>
-			<html:datalist id="ai-toolkit-anthropic-models">
-				<html:option value="claude-opus-4-8"/>
-				<html:option value="claude-sonnet-4-6"/>
-				<html:option value="claude-haiku-4-5"/>
-			</html:datalist>
-		</hbox>
-
-		<hbox align="center">
-			<label value="ChatGPT model:" style="min-width: 12em;"/>
-			<html:input type="text" id="ai-toolkit-openai-model"
-			            style="width: 20em;" list="ai-toolkit-openai-models"
-			            preference="extensions.zotero-ai-toolkit.openaiModel"/>
-			<html:datalist id="ai-toolkit-openai-models">
-				<html:option value="gpt-5"/>
-				<html:option value="gpt-5-mini"/>
-				<html:option value="gpt-5.4-nano"/>
-				<html:option value="gpt-4o"/>
-			</html:datalist>
-		</hbox>
-
-		<description style="opacity: 0.7;">
-			Any model ID accepted by the provider's API can be entered.
-			claude-opus-4-8 gives the highest-quality output; claude-sonnet-4-6 and
-			claude-haiku-4-5 are faster and cheaper.
-		</description>
-	</groupbox>
-
-	<groupbox>
 		<label><html:h2>Summarize</html:h2></label>
+
+		<hbox align="center">
+			<label value="Model:" style="min-width: 12em;"/>
+			<menulist id="ai-toolkit-summarize-model" native="true"
+			          preference="extensions.zotero-ai-toolkit.summarizeModel">
+				<menupopup>
+					<menuitem label="— Anthropic (Claude) —" disabled="true"/>
+					<menuitem label="Claude Opus 4.8 — most capable" value="claude-opus-4-8"/>
+					<menuitem label="Claude Sonnet 4.6 — balanced (default)" value="claude-sonnet-4-6"/>
+					<menuitem label="Claude Haiku 4.5 — fastest &amp; cheapest" value="claude-haiku-4-5"/>
+					<menuseparator/>
+					<menuitem label="— OpenAI (GPT) —" disabled="true"/>
+					<menuitem label="GPT-5.5 — most capable" value="gpt-5.5"/>
+					<menuitem label="GPT-5.4 — balanced" value="gpt-5.4"/>
+					<menuitem label="GPT-5.4 mini — fast &amp; cheap" value="gpt-5.4-mini"/>
+					<menuitem label="GPT-5.4 nano — cheapest" value="gpt-5.4-nano"/>
+				</menupopup>
+			</menulist>
+		</hbox>
 
 		<hbox align="center">
 			<label value="Output language:" style="min-width: 12em;"/>
@@ -125,6 +99,26 @@
 			taxonomy, so blue always means “not yet categorized”.
 		</description>
 
+		<hbox align="center">
+			<label value="Model:" style="min-width: 12em;"/>
+			<menulist id="ai-toolkit-categorize-model" native="true"
+			          preference="extensions.zotero-ai-toolkit.categorizeModel">
+				<menupopup>
+					<menuitem label="— Anthropic (Claude) —" disabled="true"/>
+					<menuitem label="Claude Opus 4.8 — most capable" value="claude-opus-4-8"/>
+					<menuitem label="Claude Sonnet 4.6 — balanced" value="claude-sonnet-4-6"/>
+					<menuitem label="Claude Haiku 4.5 — fastest &amp; cheapest (default)" value="claude-haiku-4-5"/>
+					<menuseparator/>
+					<menuitem label="— OpenAI (GPT) —" disabled="true"/>
+					<menuitem label="GPT-5.5 — most capable" value="gpt-5.5"/>
+					<menuitem label="GPT-5.4 — balanced" value="gpt-5.4"/>
+					<menuitem label="GPT-5.4 mini — fast &amp; cheap" value="gpt-5.4-mini"/>
+					<menuitem label="GPT-5.4 nano — cheapest" value="gpt-5.4-nano"/>
+				</menupopup>
+			</menulist>
+			<label value="(classification is easy — a small model is plenty)" style="opacity: 0.7;"/>
+		</hbox>
+
 		<vbox>
 			<label value="Categories — one per line: #color | Name | what belongs there (leave empty for built-in taxonomy):"/>
 			<html:textarea id="ai-toolkit-categories" rows="8" style="width: 95%; font-family: monospace; font-size: 0.9em;"
@@ -154,6 +148,26 @@
 			Right-click an article → “Find further reading (AI)”. The model reads the paper and
 			its bibliography, searches the web, and saves a child note of recommended sources.
 		</description>
+
+		<hbox align="center">
+			<label value="Model:" style="min-width: 12em;"/>
+			<menulist id="ai-toolkit-expand-model" native="true"
+			          preference="extensions.zotero-ai-toolkit.expandModel">
+				<menupopup>
+					<menuitem label="— Anthropic (Claude) —" disabled="true"/>
+					<menuitem label="Claude Opus 4.8 — most capable (default)" value="claude-opus-4-8"/>
+					<menuitem label="Claude Sonnet 4.6 — balanced" value="claude-sonnet-4-6"/>
+					<menuitem label="Claude Haiku 4.5 — fastest &amp; cheapest" value="claude-haiku-4-5"/>
+					<menuseparator/>
+					<menuitem label="— OpenAI (GPT) —" disabled="true"/>
+					<menuitem label="GPT-5.5 — most capable" value="gpt-5.5"/>
+					<menuitem label="GPT-5.4 — balanced" value="gpt-5.4"/>
+					<menuitem label="GPT-5.4 mini — fast &amp; cheap" value="gpt-5.4-mini"/>
+					<menuitem label="GPT-5.4 nano — cheapest" value="gpt-5.4-nano"/>
+				</menupopup>
+			</menulist>
+			<label value="(uses web search — a strong model verifies sources best)" style="opacity: 0.7;"/>
+		</hbox>
 
 		<hbox align="center">
 			<label value="Number of recommendations:" style="min-width: 12em;"/>

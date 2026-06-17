@@ -134,21 +134,21 @@ Be faithful to the text. If something is not stated in the article, say so inste
 		return Number.isFinite(n) && n > 0 ? n : fallback;
 	},
 
-	getProvider() {
-		return this.getPref("provider") === "openai" ? "openai" : "anthropic";
+	// Each tool stores its own model ID. The provider (and therefore which API
+	// key is used) is inferred from that ID, so the user just picks from one
+	// combined Claude + GPT list.
+	providerForModel(model) {
+		return /^claude/i.test(String(model || "").trim()) ? "anthropic" : "openai";
+	},
+
+	getModelForTool(toolKey, fallback) {
+		let model = (this.getPref(toolKey) || "").trim();
+		return model || fallback;
 	},
 
 	getApiKey(provider) {
 		let key = this.getPref(provider === "openai" ? "openaiApiKey" : "anthropicApiKey");
 		return (key || "").trim();
-	},
-
-	getModel(provider) {
-		let model = (this.getPref(provider === "openai" ? "openaiModel" : "anthropicModel") || "").trim();
-		if (!model) {
-			model = provider === "openai" ? "gpt-5" : "claude-opus-4-8";
-		}
-		return model;
 	},
 
 	/* ---------------------------------------------------------------- */
@@ -229,19 +229,22 @@ Be faithful to the text. If something is not stated in the article, say so inste
 		return targets;
 	},
 
-	/** Returns {provider, apiKey} or null (after notifying and opening settings). */
-	_requireApiKey() {
-		let provider = this.getProvider();
+	/**
+	 * Resolves the provider + API key for a tool's chosen model.
+	 * Returns {provider, apiKey, model} or null (after notifying and opening settings).
+	 */
+	_resolveCreds(model) {
+		let provider = this.providerForModel(model);
 		let apiKey = this.getApiKey(provider);
 		if (!apiKey) {
 			this._notify("AI Toolkit", "No API key configured for " + this._providerLabel(provider)
-				+ ". Opening settings…");
+				+ " — needed for the selected model " + model + ". Opening settings…");
 			if (this.paneID) {
 				Zotero.Utilities.Internal.openPreferences(this.paneID);
 			}
 			return null;
 		}
-		return { provider, apiKey };
+		return { provider, apiKey, model };
 	},
 
 	async summarizeSelected(window) {
@@ -256,7 +259,8 @@ Be faithful to the text. If something is not stated in the article, say so inste
 			return;
 		}
 
-		let creds = this._requireApiKey();
+		let model = this.getModelForTool("summarizeModel", "claude-sonnet-4-6");
+		let creds = this._resolveCreds(model);
 		if (!creds) {
 			return;
 		}
@@ -264,7 +268,7 @@ Be faithful to the text. If something is not stated in the article, say so inste
 
 		this._running = true;
 		let pw = new Zotero.ProgressWindow({ closeOnClick: false });
-		pw.changeHeadline("Summarize with AI — " + this._providerLabel(provider));
+		pw.changeHeadline("Summarize with AI — " + model);
 		pw.show();
 
 		let succeeded = 0;
@@ -274,7 +278,7 @@ Be faithful to the text. If something is not stated in the article, say so inste
 				let shortTitle = title.length > 60 ? title.slice(0, 57) + "…" : title;
 				let line = new pw.ItemProgress(null, "Summarizing: " + shortTitle);
 				try {
-					await this._summarizeItem(item, provider, apiKey);
+					await this._summarizeItem(item, provider, apiKey, model);
 					line.setProgress(100);
 					line.setText("Note created: " + shortTitle);
 					succeeded++;
@@ -296,7 +300,7 @@ Be faithful to the text. If something is not stated in the article, say so inste
 		pw.startCloseTimer(8000);
 	},
 
-	async _summarizeItem(item, provider, apiKey) {
+	async _summarizeItem(item, provider, apiKey, model) {
 		let extracted = await this._getItemText(item);
 		if (!extracted) {
 			throw new Error("no full text or abstract available");
@@ -313,7 +317,6 @@ Be faithful to the text. If something is not stated in the article, say so inste
 		let systemPrompt = this._buildSystemPrompt();
 		let userContent = this._buildUserContent(item, text, extracted.source, truncated);
 
-		let model = this.getModel(provider);
 		let raw = provider === "openai"
 			? await this._callOpenAI(apiKey, model, systemPrompt, userContent)
 			: await this._callAnthropic(apiKey, model, systemPrompt, userContent);
@@ -368,7 +371,8 @@ Be faithful to the text. If something is not stated in the article, say so inste
 			return;
 		}
 
-		let creds = this._requireApiKey();
+		let model = this.getModelForTool("categorizeModel", "claude-haiku-4-5");
+		let creds = this._resolveCreds(model);
 		if (!creds) {
 			return;
 		}
@@ -385,7 +389,7 @@ Be faithful to the text. If something is not stated in the article, say so inste
 
 		this._running = true;
 		let pw = new Zotero.ProgressWindow({ closeOnClick: false });
-		pw.changeHeadline("Categorize Highlights — " + this._providerLabel(provider));
+		pw.changeHeadline("Categorize Highlights — " + model);
 		pw.show();
 
 		try {
@@ -394,7 +398,7 @@ Be faithful to the text. If something is not stated in the article, say so inste
 				let shortTitle = title.length > 60 ? title.slice(0, 57) + "…" : title;
 				let line = new pw.ItemProgress(null, "Categorizing highlights: " + shortTitle);
 				try {
-					let stats = await this._categorizeItem(item, provider, apiKey, categories);
+					let stats = await this._categorizeItem(item, provider, apiKey, categories, model);
 					line.setProgress(100);
 					line.setText("Categorized " + stats.categorized + "/" + stats.total
 						+ " highlights: " + shortTitle);
@@ -412,7 +416,7 @@ Be faithful to the text. If something is not stated in the article, say so inste
 		pw.startCloseTimer(8000);
 	},
 
-	async _categorizeItem(item, provider, apiKey, categories) {
+	async _categorizeItem(item, provider, apiKey, categories, model) {
 		let highlights = this._collectHighlights(item);
 		if (!highlights.length) {
 			throw new Error("no highlight annotations found — highlight passages in the PDF first");
@@ -421,7 +425,6 @@ Be faithful to the text. If something is not stated in the article, say so inste
 		let systemPrompt = this._buildCategorizeSystemPrompt(categories);
 		let userContent = this._buildCategorizeUserContent(item, highlights);
 
-		let model = this.getModel(provider);
 		let raw = provider === "openai"
 			? await this._callOpenAI(apiKey, model, systemPrompt, userContent)
 			: await this._callAnthropic(apiKey, model, systemPrompt, userContent);
@@ -846,41 +849,59 @@ Be faithful to the text. If something is not stated in the article, say so inste
 	/* Settings-pane helpers                                            */
 	/* ---------------------------------------------------------------- */
 
-	/** Sends a minimal request so the user can verify their key in settings. */
+	/**
+	 * Verifies each API key that is filled in, with a tiny request to a cheap
+	 * model for that provider. Reports a result per provider so the user can
+	 * confirm both keys independently.
+	 */
 	async testApiKey() {
-		let provider = this.getProvider();
-		let apiKey = this.getApiKey(provider);
-		if (!apiKey) {
-			return { success: false, message: "Enter an API key for " + this._providerLabel(provider) + " first." };
+		let anthropicKey = this.getApiKey("anthropic");
+		let openaiKey = this.getApiKey("openai");
+		if (!anthropicKey && !openaiKey) {
+			return { success: false, message: "Enter at least one API key first." };
 		}
-		let model = this.getModel(provider);
-		try {
-			if (provider === "openai") {
-				await this._post(this.OPENAI_URL, {
-					"Content-Type": "application/json",
-					"Authorization": "Bearer " + apiKey,
-				}, {
-					model: model,
-					max_completion_tokens: 32,
-					messages: [{ role: "user", content: "Reply with the single word OK." }],
-				}, true);
-			}
-			else {
+
+		let results = [];
+		let allOk = true;
+
+		if (anthropicKey) {
+			try {
 				await this._post(this.ANTHROPIC_URL, {
 					"Content-Type": "application/json",
-					"x-api-key": apiKey,
+					"x-api-key": anthropicKey,
 					"anthropic-version": "2023-06-01",
 				}, {
-					model: model,
-					max_tokens: 32,
+					model: "claude-haiku-4-5",
+					max_tokens: 16,
 					messages: [{ role: "user", content: "Reply with the single word OK." }],
 				}, true);
+				results.push("Anthropic ✓");
 			}
-			return { success: true, message: "Success — " + this._providerLabel(provider) + " accepted the key (model: " + model + ")." };
+			catch (e) {
+				allOk = false;
+				results.push("Anthropic ✗ (" + this._shortError(e) + ")");
+			}
 		}
-		catch (e) {
-			return { success: false, message: "Failed: " + this._shortError(e) };
+
+		if (openaiKey) {
+			try {
+				await this._post(this.OPENAI_URL, {
+					"Content-Type": "application/json",
+					"Authorization": "Bearer " + openaiKey,
+				}, {
+					model: "gpt-5.4-mini",
+					max_completion_tokens: 16,
+					messages: [{ role: "user", content: "Reply with the single word OK." }],
+				}, true);
+				results.push("OpenAI ✓");
+			}
+			catch (e) {
+				allOk = false;
+				results.push("OpenAI ✗ (" + this._shortError(e) + ")");
+			}
 		}
+
+		return { success: allOk, message: results.join("   ·   ") };
 	},
 
 	/* ---------------------------------------------------------------- */

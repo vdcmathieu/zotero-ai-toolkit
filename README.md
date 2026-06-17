@@ -79,13 +79,30 @@ before citing — models can still get details wrong.
 Selecting a PDF attachment works too — the parent item is used. Running a command again creates
 a new note; existing notes are never modified or deleted.
 
-## Settings
+## Models
+
+Store an **Anthropic** key, an **OpenAI** key, or both at the top of the settings.
+Then **each tool picks its own model** from one combined list — the provider (and which
+key is used) is inferred from the model you choose, so you can give the heavy job a
+flagship model and the cheap job a small one:
+
+| Provider | Models offered | Rough cost (in / out per Mtok) |
+| --- | --- | --- |
+| Anthropic | `claude-opus-4-8` (most capable), `claude-sonnet-4-6` (balanced), `claude-haiku-4-5` (fastest/cheapest) | $5/$25 · $3/$15 · $1/$5 |
+| OpenAI | `gpt-5.5` (most capable), `gpt-5.4` (balanced), `gpt-5.4-mini` (fast/cheap), `gpt-5.4-nano` (cheapest) | $5/$30 · $2.50/$15 · $0.75/$4.50 |
+
+Task-appropriate defaults (a single Anthropic key works out of the box; switch any tool to GPT freely):
+
+| Tool | Default | Why |
+| --- | --- | --- |
+| Summarize | `claude-sonnet-4-6` | strong comprehension + long context, good for batches |
+| Categorize highlights | `claude-haiku-4-5` | classification is easy and high-volume — go cheap & fast |
+| Find further reading | `claude-opus-4-8` | hardest task (reading + web search + verifying sources) |
+
+## Other settings
 
 | Setting | Default | Notes |
 | --- | --- | --- |
-| Provider | Anthropic (Claude) | Shared by all tools; both keys can be stored |
-| Claude model | `claude-opus-4-8` | `claude-sonnet-4-6` / `claude-haiku-4-5` are faster & cheaper |
-| ChatGPT model | `gpt-5` | Any model ID accepted by the API works |
 | Output language | English | Inserted into the summary prompt via `{language}` |
 | Max output tokens | 16000 | Upper bound for generated summaries |
 | Max input characters | 200000 | Longer article text is truncated (noted in the summary) |
