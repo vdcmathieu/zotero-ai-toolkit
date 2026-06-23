@@ -31,18 +31,19 @@ var AISummarizer = {
 
 	DEFAULT_PROMPT: `You are an expert research assistant helping an academic build a literature-review knowledge base in Zotero.
 
-Summarize the article below. Return WELL-FORMED HTML only (allowed tags: <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>, <blockquote>). Do not include <html>, <head>, <body> tags, markdown, or code fences. Use exactly this structure:
+Summarize the article below for a domain expert skimming their library. Return WELL-FORMED HTML only (allowed tags: <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>, <blockquote>, with no attributes on any tag). No <html>/<head>/<body>, no markdown, no code fences. Write a literal & as &amp;. Do not output a title, date, source, or any preamble or closing remark — start directly at the first <h2> below.
 
-<h2>TL;DR</h2> 2-3 plain-language sentences.
-<h2>Research Question &amp; Motivation</h2> What the paper asks and why it matters.
-<h2>Methodology</h2> Design, data, sample, and analysis approach.
-<h2>Key Findings</h2> Bullet list; include effect sizes / statistics where reported.
-<h2>Contributions &amp; Implications</h2> Theoretical and practical contributions.
-<h2>Limitations</h2> Stated and evident limitations.
-<h2>Notable Quotes</h2> 1-3 short verbatim quotes, with section hints if possible.
-<h2>Suggested Keywords</h2> 5-8 tags as a comma-separated list.
+Faithfulness (overriding rule): use ONLY what the supplied text states. Never invent findings, numbers, samples, citations, or quotes. The user message marks the source as full text or abstract only, and whether it was truncated. If abstract only, put <em>Based on the abstract only.</em> as the first content; if truncated, put <em>Based on a truncated extract; later parts of the paper may be missing.</em> as the first content. For any section the source does not support (e.g. Methodology or Limitations from an abstract), emit the heading with exactly one line: <p><em>Not reported in the provided text.</em></p> — do not speculate or pad.
 
-Be faithful to the text. If something is not stated in the article, say so instead of guessing. If you were only given an abstract, note that the summary is based on the abstract alone. Write in {language}.`,
+Always emit every heading below, in this order, so notes are skimmable to a fixed position:
+<h2>TL;DR</h2> 2-3 sentences: what was done and what was found.
+<h2>Research Question &amp; Method</h2> The question, why it matters, and the design, data, sample, and analysis approach.
+<h2>Key Findings</h2> Bullet list. Lead each bullet with the result; give effect sizes, sample sizes, and statistics (p, CI) exactly as reported, with direction. If a finding has no reported statistic, state the qualitative result and say statistics were not reported.
+<h2>Contributions &amp; Implications</h2> What is new and what it means in theory and practice — concise, no repetition of the findings above.
+<h2>Limitations</h2> Limitations stated by the authors and any evident from the method.
+<h2>Keywords</h2> 5-8 general, reusable, lowercase field terms a reader would browse by (not phrasing unique to this paper), comma-separated.
+
+Write everything, headings and body, in {language}.`,
 
 	/**
 	 * Fixed highlight taxonomy, one category per line: "#color | Name | what belongs there".
@@ -526,6 +527,8 @@ Be faithful to the text. If something is not stated in the article, say so inste
 	},
 
 	_buildCategorizeSystemPrompt(categories) {
+		let firstKey = categories[0].key;
+		let fallback = categories[categories.length - 1].key;
 		let lines = [
 			"You are classifying highlighted passages from an academic article into a fixed taxonomy, so that highlight colors mean the same thing across an entire Zotero library.",
 			"",
@@ -534,11 +537,12 @@ Be faithful to the text. If something is not stated in the article, say so inste
 		for (let cat of categories) {
 			lines.push("- " + cat.key + " — " + cat.name + (cat.description ? ": " + cat.description : ""));
 		}
-		let fallback = categories[categories.length - 1].key;
 		lines.push("");
-		lines.push("Assign exactly one category to every highlight. Judge each passage in the context of the article; the reader's own notes on a highlight, when present, are strong hints. When a passage fits several categories, pick the one most useful for a later literature review. Use \"" + fallback + "\" only when nothing else fits.");
+		lines.push("Classify each highlight by its primary function — what the passage itself asserts or contributes — not by incidental wording (a result phrased memorably is still its result category, not a quotable one). A reader note on a highlight, when present, overrides the passage text: if the note points to a category, use it. When a passage genuinely fits more than one category, prefer the more specific, substantive category over a stylistic or catch-all one. Use \"" + fallback + "\" only when nothing else fits. The article title and abstract are context only — classify the highlighted passages themselves.");
 		lines.push("");
-		lines.push('Return ONLY a JSON array — no prose, no code fences — with one object per highlight: [{"i": 1, "c": "' + categories[0].key + '"}, …] where "i" is the highlight number and "c" is one of the category keys above.');
+		lines.push("Return exactly one object per highlight: array length must equal the number of highlights, with \"i\" running 1, 2, 3, ... in order, every number present once, none skipped or duplicated.");
+		lines.push("");
+		lines.push('Return ONLY a JSON array — no prose, no code fences — like: [{"i": 1, "c": "' + firstKey + '"}, {"i": 2, "c": "' + fallback + '"}, ...] where "i" is the highlight number and "c" is one of the category keys above.');
 		return lines.join("\n");
 	},
 

@@ -18,8 +18,10 @@ It currently bundles four tools, all sharing the same two API keys:
 ## Features
 
 ### Summarize with AI
-- **Structured notes**: TL;DR, research question & motivation, methodology, key findings,
-  contributions, limitations, notable quotes, and suggested keywords.
+- **Structured notes**: TL;DR, research question & method, key findings,
+  contributions & implications, limitations, and reusable keywords — fixed headings so
+  every note is skimmable to the same position, with unsupported sections marked
+  "Not reported" rather than padded.
 - **Reads the real paper**: uses the full text Zotero has indexed from the item's best
   attachment (PDF, EPUB, snapshot) and falls back to the abstract — the note records
   which source was used.
