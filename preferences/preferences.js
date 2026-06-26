@@ -42,6 +42,14 @@
 		}
 	}
 
+	function setChatPrompt(value) {
+		setPref("chatSystemPrompt", value);
+		let textarea = $("ai-toolkit-chat-prompt");
+		if (textarea) {
+			textarea.value = value;
+		}
+	}
+
 	function init() {
 		let testButton = $("ai-toolkit-test-key");
 		if (testButton) {
@@ -85,6 +93,19 @@
 		if (clearCategoriesButton) {
 			clearCategoriesButton.addEventListener("click", () => {
 				setCategories("");
+			});
+		}
+
+		let loadDefaultChatButton = $("ai-toolkit-load-default-chat-prompt");
+		if (loadDefaultChatButton) {
+			loadDefaultChatButton.addEventListener("click", () => {
+				setChatPrompt(Zotero.AIChat.DEFAULT_SYSTEM_PROMPT);
+			});
+		}
+		let clearChatButton = $("ai-toolkit-clear-chat-prompt");
+		if (clearChatButton) {
+			clearChatButton.addEventListener("click", () => {
+				setChatPrompt("");
 			});
 		}
 	}
