@@ -345,6 +345,10 @@ ZoteroChat = {
 			typing.remove();
 			const answer = reply && reply.text;
 			if (!answer || !answer.trim()) {
+				// Drop the unanswered user turn so the history stays strictly
+				// alternating — otherwise the next send queues two user turns in a
+				// row and Anthropic rejects the request, wedging the chat.
+				panel.messages.pop();
 				this._appendError(panel, "The model returned an empty response.");
 			}
 			else {
@@ -358,6 +362,9 @@ ZoteroChat = {
 		catch (e) {
 			Zotero.logError(e);
 			typing.remove();
+			// Same as the empty-response case: a failed turn must not leave a
+			// dangling user message, or the next send breaks role alternation.
+			panel.messages.pop();
 			this._appendError(panel, AISummarizer._shortError(e));
 		}
 		finally {
