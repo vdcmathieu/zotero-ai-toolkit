@@ -6,7 +6,7 @@ or **OpenAI ChatGPT** — you bring your own API key and pay the provider direct
 There is no hosted service: your key is stored locally and paper text is sent only
 to the provider you choose, only when you trigger a command.
 
-It currently bundles four tools, all sharing the same two API keys:
+It currently bundles five tools, all sharing the same two API keys:
 
 1. **Summarize papers** — structured, literature-review-ready child notes.
 2. **Categorize highlights** — recolor your highlights into a fixed, consistent taxonomy.
@@ -14,6 +14,8 @@ It currently bundles four tools, all sharing the same two API keys:
    save a note of recommended sources.
 4. **Suggest folder** — read a paper, look at your folders, and recommend where to
    file it (an existing folder or a new one), then file it for you.
+5. **Ask a question (chat)** — open a chat panel grounded in a single paper and ask
+   follow-up questions, then save the conversation as a note.
 
 ## Features
 
@@ -74,6 +76,15 @@ where to file it. The recommendation appears in a **popup** showing just the fol
 New-folder suggestions are kept short and general so they can hold related future papers, and the
 model is told to prefer an existing folder whenever the paper fits one.
 
+### Ask a Question (Chat with AI)
+Right-click a paper → **Ask a question (AI)** (or press `Cmd/Ctrl + Shift + A`). A chat panel docks
+on the right edge of the Zotero window with the **whole paper loaded as context**, so you can ask
+follow-up questions and get answers grounded **only** in that paper's text. The paper rides in the
+model's system prompt once (so it stays a cheap, stable prefix) and only your questions and the
+model's answers grow the conversation. **New chat** starts over, and **Save to note** stores the
+whole transcript as a child note tagged `ai-chat`. Answers default to the paper's full text and fall
+back to the abstract or metadata when no full text is available, noting that limitation.
+
 ## Installation
 
 1. Build the plugin package:
@@ -94,6 +105,7 @@ model is told to prefer an existing folder whenever the paper fits one.
 | Categorize highlights | Select item(s) → `Cmd/Ctrl + Shift + H` or right-click → *Categorize Highlights with AI* |
 | Find further reading | Right-click an article → *Find further reading (AI)* |
 | Suggest folder | Select item → `Cmd/Ctrl + Shift + F` or right-click → *Suggest folder (AI)* |
+| Ask a question (chat) | Select item → `Cmd/Ctrl + Shift + A` or right-click → *Ask a question (AI)* |
 
 Selecting a PDF attachment works too — the parent item is used. Running a command again creates
 a new note; existing notes are never modified or deleted.
@@ -118,6 +130,7 @@ Task-appropriate defaults (a single Anthropic key works out of the box; switch a
 | Categorize highlights | `claude-haiku-4-5` | classification is easy and high-volume — go cheap & fast |
 | Find further reading | `claude-opus-4-8` | hardest task (reading + web search + verifying sources) |
 | Suggest folder | `claude-sonnet-4-6` | match a paper to your folder taxonomy — needs good comprehension |
+| Ask a question (chat) | `claude-sonnet-4-6` | grounded Q&A over one paper — balanced comprehension and cost |
 
 ## Other settings
 
@@ -129,7 +142,7 @@ Task-appropriate defaults (a single Anthropic key works out of the box; switch a
 | Summary prompt template | built-in | Leave empty to use the built-in academic template |
 | Highlight categories | built-in taxonomy | `#color | Name | description` per line |
 | Number of recommendations | 8 | 1–30, for Find Further Reading |
-| Shortcuts | Cmd/Ctrl+Shift+S / +H | Modifiers and letters configurable |
+| Shortcuts | Cmd/Ctrl+Shift+S / +H / +F / +A | Modifiers and letters configurable (summarize / categorize / suggest folder / ask a question) |
 
 ## Security & privacy
 
@@ -167,6 +180,7 @@ src/summarizer.js           Summarize + highlight categorization (Zotero.AISumma
 src/expand.js               Find further reading — controller (ZoteroExpand)
 src/expand-ai.js            Find further reading — AI client (ZoteroExpandAI)
 src/sorter.js               Suggest folder — collections + recommendation popup (ZoteroSort)
+src/chat.js                 Ask a question — paper-grounded chat panel (Zotero.AIChat / ZoteroChat)
 preferences/preferences.xhtml   Shared settings pane UI
 preferences/preferences.js      Settings pane logic (test key, prompt/category buttons)
 build.sh                    Packages everything into zotero-ai-toolkit.xpi

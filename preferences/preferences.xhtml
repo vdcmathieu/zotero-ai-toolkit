@@ -214,6 +214,60 @@
 	</groupbox>
 
 	<groupbox>
+		<label><html:h2>Ask a Question (Chat)</html:h2></label>
+
+		<description style="opacity: 0.7;">
+			Right-click a paper → “Ask a question (AI)” (or press `Cmd/Ctrl + Shift + A`). A chat
+			panel docks on the right edge of the window with the whole paper loaded as context, so
+			you can ask follow-up questions grounded only in that paper. Save the conversation as a
+			child note any time.
+		</description>
+
+		<hbox align="center">
+			<label value="Model:" style="min-width: 12em;"/>
+			<menulist id="ai-toolkit-chat-model" native="true"
+			          preference="extensions.zotero-ai-toolkit.chatModel">
+				<menupopup>
+					<menuitem label="— Anthropic (Claude) —" disabled="true"/>
+					<menuitem label="Claude Opus 4.8 — most capable" value="claude-opus-4-8"/>
+					<menuitem label="Claude Sonnet 4.6 — balanced (default)" value="claude-sonnet-4-6"/>
+					<menuitem label="Claude Haiku 4.5 — fastest &amp; cheapest" value="claude-haiku-4-5"/>
+					<menuseparator/>
+					<menuitem label="— OpenAI (GPT) —" disabled="true"/>
+					<menuitem label="GPT-5.5 — most capable" value="gpt-5.5"/>
+					<menuitem label="GPT-5.4 — balanced" value="gpt-5.4"/>
+					<menuitem label="GPT-5.4 mini — fast &amp; cheap" value="gpt-5.4-mini"/>
+					<menuitem label="GPT-5.4 nano — cheapest" value="gpt-5.4-nano"/>
+				</menupopup>
+			</menulist>
+		</hbox>
+
+		<hbox align="center">
+			<label value="Max input characters:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-toolkit-chat-max-chars" style="width: 8em;"
+			            preference="extensions.zotero-ai-toolkit.chatMaxInputChars"/>
+			<label value="(longer papers are truncated)" style="opacity: 0.7;"/>
+		</hbox>
+
+		<hbox align="center">
+			<label value="Max output tokens:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-toolkit-chat-max-tokens" style="width: 8em;"
+			            preference="extensions.zotero-ai-toolkit.chatMaxOutputTokens"/>
+			<label value="(per answer)" style="opacity: 0.7;"/>
+		</hbox>
+
+		<vbox>
+			<label value="Custom system prompt (leave empty to use the built-in grounding prompt; the paper is appended automatically):"/>
+			<html:textarea id="ai-toolkit-chat-prompt" rows="8" style="width: 95%; font-family: monospace; font-size: 0.9em;"
+			               preference="extensions.zotero-ai-toolkit.chatSystemPrompt"/>
+			<hbox>
+				<html:button id="ai-toolkit-load-default-chat-prompt">Load built-in prompt into editor</html:button>
+				<html:button id="ai-toolkit-clear-chat-prompt">Reset to built-in</html:button>
+			</hbox>
+		</vbox>
+	</groupbox>
+
+	<groupbox>
 		<label><html:h2>Keyboard Shortcuts</html:h2></label>
 
 		<hbox align="center">
@@ -240,13 +294,17 @@
 			<html:input type="text" id="ai-toolkit-sort-key" maxlength="1"
 			            style="width: 3em; text-align: center;"
 			            preference="extensions.zotero-ai-toolkit.sortShortcutKey"/>
+			<label value="+ ask-question key:"/>
+			<html:input type="text" id="ai-toolkit-chat-key" maxlength="1"
+			            style="width: 3em; text-align: center;"
+			            preference="extensions.zotero-ai-toolkit.chatShortcutKey"/>
 		</hbox>
 
 		<description style="opacity: 0.7;">
 			Defaults: Cmd/Ctrl + Shift + S to summarize, Cmd/Ctrl + Shift + H to categorize
-			highlights, Cmd/Ctrl + Shift + F to suggest a folder — with one or more items
-			selected in the library. All three are also available by right-clicking selected
-			items. The keys must be different from each other.
+			highlights, Cmd/Ctrl + Shift + F to suggest a folder, Cmd/Ctrl + Shift + A to ask a
+			question — with one or more items selected in the library. All four are also available
+			by right-clicking selected items. The four keys must be different from each other.
 		</description>
 	</groupbox>
 

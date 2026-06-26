@@ -167,6 +167,7 @@ Write everything, headings and body, in {language}.`,
 		let summarizeKey = (this.getPref("shortcutKey") || "S").toLowerCase();
 		let categorizeKey = (this.getPref("categorizeShortcutKey") || "H").toLowerCase();
 		let sortKey = (this.getPref("sortShortcutKey") || "F").toLowerCase();
+		let chatKey = (this.getPref("chatShortcutKey") || "A").toLowerCase();
 		let action = null;
 		if (pressed === summarizeKey) {
 			action = "summarize";
@@ -176,6 +177,9 @@ Write everything, headings and body, in {language}.`,
 		}
 		else if (pressed === sortKey) {
 			action = "sort";
+		}
+		else if (pressed === chatKey) {
+			action = "chat";
 		}
 		if (!action) {
 			return;
@@ -204,6 +208,12 @@ Write everything, headings and body, in {language}.`,
 			// ZoteroSort lives in the same bootstrap scope (loaded by bootstrap.js).
 			if (typeof ZoteroSort !== "undefined" && ZoteroSort) {
 				ZoteroSort.run(window);
+			}
+		}
+		else if (action === "chat") {
+			// ZoteroChat lives in the same bootstrap scope (loaded by bootstrap.js).
+			if (typeof ZoteroChat !== "undefined" && ZoteroChat) {
+				ZoteroChat.run(window);
 			}
 		}
 		else {

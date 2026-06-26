@@ -14,12 +14,18 @@ pref("extensions.zotero-ai-toolkit.summarizeModel", "claude-sonnet-4-6");
 pref("extensions.zotero-ai-toolkit.categorizeModel", "claude-haiku-4-5");
 pref("extensions.zotero-ai-toolkit.expandModel", "claude-opus-4-8");
 pref("extensions.zotero-ai-toolkit.sortModel", "claude-sonnet-4-6");
+pref("extensions.zotero-ai-toolkit.chatModel", "claude-sonnet-4-6");
 
 // --- Summarize ------------------------------------------------------------
 pref("extensions.zotero-ai-toolkit.maxOutputTokens", "16000");
 pref("extensions.zotero-ai-toolkit.maxInputChars", "200000");
 pref("extensions.zotero-ai-toolkit.outputLanguage", "English");
 pref("extensions.zotero-ai-toolkit.promptTemplate", "");
+
+// --- Ask a question (Chat) ------------------------------------------------
+pref("extensions.zotero-ai-toolkit.chatMaxInputChars", "150000");
+pref("extensions.zotero-ai-toolkit.chatMaxOutputTokens", "4096");
+pref("extensions.zotero-ai-toolkit.chatSystemPrompt", "");
 
 // --- Highlight categorization ---------------------------------------------
 pref("extensions.zotero-ai-toolkit.categories", "");
@@ -38,3 +44,4 @@ pref("extensions.zotero-ai-toolkit.shortcutAlt", false);
 pref("extensions.zotero-ai-toolkit.shortcutKey", "S");
 pref("extensions.zotero-ai-toolkit.categorizeShortcutKey", "H");
 pref("extensions.zotero-ai-toolkit.sortShortcutKey", "F");
+pref("extensions.zotero-ai-toolkit.chatShortcutKey", "A");

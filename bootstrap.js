@@ -9,6 +9,7 @@ var ZoteroExpand;
 var ZoteroExpandAI;
 var AISummarizer;
 var ZoteroSort;
+var ZoteroChat;
 
 const PLUGIN_ID = "zotero-ai-toolkit@vandemathieu";
 
@@ -26,11 +27,13 @@ async function startup({ id, version, rootURI }) {
 	Services.scriptloader.loadSubScript(rootURI + "src/expand.js");
 	Services.scriptloader.loadSubScript(rootURI + "src/summarizer.js");
 	Services.scriptloader.loadSubScript(rootURI + "src/sorter.js");
+	Services.scriptloader.loadSubScript(rootURI + "src/chat.js");
 
 	// Initialise each controller.
 	ZoteroExpand.init({ id, version, rootURI });
 	await AISummarizer.init({ id, version, rootURI });
 	ZoteroSort.init({ id, version, rootURI });
+	ZoteroChat.init({ id, version, rootURI });
 
 	// One shared preference pane for the whole toolkit.
 	const paneID = await Zotero.PreferencePanes.register({
@@ -55,12 +58,14 @@ function addToWindow(window) {
 	if (ZoteroExpand) ZoteroExpand.addToWindow(window);
 	if (AISummarizer) AISummarizer.addToWindow(window);
 	if (ZoteroSort) ZoteroSort.addToWindow(window);
+	if (ZoteroChat) ZoteroChat.addToWindow(window);
 }
 
 function removeFromWindow(window) {
 	if (ZoteroExpand) ZoteroExpand.removeFromWindow(window);
 	if (AISummarizer) AISummarizer.removeFromWindow(window);
 	if (ZoteroSort) ZoteroSort.removeFromWindow(window);
+	if (ZoteroChat) ZoteroChat.removeFromWindow(window);
 }
 
 function onMainWindowLoad({ window }) {
@@ -79,10 +84,14 @@ function shutdown() {
 	if (Zotero.AISummarizer) {
 		delete Zotero.AISummarizer;
 	}
+	if (Zotero.AIChat) {
+		delete Zotero.AIChat;
+	}
 	ZoteroExpand = undefined;
 	ZoteroExpandAI = undefined;
 	AISummarizer = undefined;
 	ZoteroSort = undefined;
+	ZoteroChat = undefined;
 }
 
 function uninstall() {}
