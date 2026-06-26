@@ -108,7 +108,7 @@ ZoteroChat = {
 		let context;
 		try {
 			const extracted = await AISummarizer._getItemText(item);
-			const maxChars = AISummarizer.getIntPref("maxInputChars", 200000);
+			const maxChars = AISummarizer.getIntPref("chatMaxInputChars", 150000);
 			let text = "";
 			let source = null;
 			let truncated = false;
