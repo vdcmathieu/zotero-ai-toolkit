@@ -6,7 +6,8 @@ or **OpenAI ChatGPT** — you bring your own API key and pay the provider direct
 There is no hosted service: your key is stored locally and paper text is sent only
 to the provider you choose, only when you trigger a command.
 
-It currently bundles five tools, all sharing the same two API keys:
+It currently bundles six tools. The five AI tools share the same two API keys;
+the journal rank column needs no key at all:
 
 1. **Summarize papers** — structured, literature-review-ready child notes.
 2. **Categorize highlights** — recolor your highlights into a fixed, consistent taxonomy.
@@ -16,6 +17,8 @@ It currently bundles five tools, all sharing the same two API keys:
    file it (an existing folder or a new one), then file it for you.
 5. **Ask a question (chat)** — open a chat panel grounded in a single paper and ask
    follow-up questions, then save the conversation as a note.
+6. **Journal rank column (FT50 checker)** — a color-coded library column: green FT50,
+   yellow ABDC A*/A, orange impact factor above 10, red anything else.
 
 ## Features
 
@@ -85,6 +88,33 @@ model's answers grow the conversation. **New chat** starts over, and **Save to n
 whole transcript as a child note tagged `ai-chat`. Answers default to the paper's full text and fall
 back to the abstract or metadata when no full text is available, noting that limitation.
 
+### Journal Rank Column (FT50 checker)
+Right-click any column header in the item list and tick **Journal rank**. Every article gets a
+colored badge for the journal it appeared in, and sorting the column groups the library by tier:
+
+| Badge | Meaning | Source |
+| --- | --- | --- |
+| 🟢 **FT50** | one of the Financial Times 50 journals (2016 revision) | bundled list, matched by ISSN or journal name |
+| 🟡 **A** | rated A* or A in the ABDC Journal Quality List 2022 (852 journals), or on your own list | bundled list + the *Extra A journals* setting |
+| 🟠 **IF > 10** | impact factor above the threshold (default 10) | OpenAlex two-year mean citedness, looked up on demand |
+| 🔴 **Other** | a journal on none of the lists | — |
+| ⚪ **?** | impact factor not looked up yet (offline, or lookup disabled) | — |
+
+Items without a journal (books, theses, reports) stay blank. Hover a badge to see why it was
+graded that way (the list entry, or the citedness value OpenAlex reported).
+
+The impact factor is Clarivate's proprietary number and cannot be fetched legally, so the
+column uses the closest open equivalent: OpenAlex's *two-year mean citedness* of the journal, which
+follows the same recipe as the JIF over OpenAlex's corpus. It tracks the JIF closely for
+business and social-science journals and undershoots it for journals with a lot of non-research
+content (Nature, Science), which still clear the threshold comfortably. Lookups send only the
+journal name or ISSN to `api.openalex.org`, are cached for 90 days in your Zotero data directory
+(`zotero-ai-toolkit/journal-rank-cache.json`), and can be turned off in the settings. Journals
+not on OpenAlex are shown red; add them to the *Extra A journals* list if they deserve better.
+
+To refresh the bundled lists, download the ABDC JQL workbook, export the "2022 JQL" sheet as CSV
+and run `python3 scripts/build-journal-lists.py <csv>`; the FT50 list lives in that script.
+
 ## Installation
 
 1. Build the plugin package:
@@ -106,6 +136,7 @@ back to the abstract or metadata when no full text is available, noting that lim
 | Find further reading | Right-click an article → *Find further reading (AI)* |
 | Suggest folder | Select item → `Cmd/Ctrl + Shift + F` or right-click → *Suggest folder (AI)* |
 | Ask a question (chat) | Select item → `Cmd/Ctrl + Shift + A` or right-click → *Ask a question (AI)* |
+| Journal rank column | Right-click a column header → *Journal rank* (no API key needed) |
 
 Selecting a PDF attachment works too — the parent item is used. Running a command again creates
 a new note; existing notes are never modified or deleted.
@@ -142,6 +173,9 @@ Task-appropriate defaults (a single Anthropic key works out of the box; switch a
 | Summary prompt template | built-in | Leave empty to use the built-in academic template |
 | Highlight categories | built-in taxonomy | `#color | Name | description` per line |
 | Number of recommendations | 8 | 1–30, for Find Further Reading |
+| Look up impact factors online | on | Journal rank column queries OpenAlex for journals not on the FT50/ABDC lists |
+| Impact factor threshold | 10 | Journals above it are orange in the Journal rank column |
+| Extra A journals | empty | One journal name or ISSN per line, treated like ABDC A |
 | Shortcuts | Cmd/Ctrl+Shift+S / +H / +F / +A | Modifiers and letters configurable (summarize / categorize / suggest folder / ask a question) |
 
 ## Security & privacy
@@ -152,6 +186,9 @@ Task-appropriate defaults (a single Anthropic key works out of the box; switch a
 - **Where your data goes**: article text and metadata are sent **only** to the provider you
   selected (`api.anthropic.com` or `api.openai.com`) over HTTPS, and **only** when you explicitly
   trigger a command. The endpoints are hard-coded — there is deliberately no "custom server" setting.
+  The journal rank column additionally sends journal names / ISSNs (never item titles or text) to
+  `api.openalex.org`, a free open-data API that needs no account; switch it off in the settings if
+  you prefer.
 - **Model output is sanitized** (scripts, embeds, event handlers, `javascript:` URLs stripped)
   before being saved into a note.
 - Check your institution's policy before sending unpublished or licensed full texts to a
@@ -181,6 +218,9 @@ src/expand.js               Find further reading — controller (ZoteroExpand)
 src/expand-ai.js            Find further reading — AI client (ZoteroExpandAI)
 src/sorter.js               Suggest folder — collections + recommendation popup (ZoteroSort)
 src/chat.js                 Ask a question — paper-grounded chat panel (Zotero.AIChat / ZoteroChat)
+src/journal-rank.js         Journal rank column — FT50 / ABDC / OpenAlex grading (ZoteroJournalRank)
+src/journal-lists.js        Generated FT50 + ABDC A*/A lists with ISSNs (do not edit by hand)
+scripts/build-journal-lists.py  Regenerates src/journal-lists.js from the ABDC CSV
 preferences/preferences.xhtml   Shared settings pane UI
 preferences/preferences.js      Settings pane logic (test key, prompt/category buttons)
 build.sh                    Packages everything into zotero-ai-toolkit.xpi

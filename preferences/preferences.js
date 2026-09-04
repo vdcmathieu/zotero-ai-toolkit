@@ -108,6 +108,38 @@
 				setChatPrompt("");
 			});
 		}
+
+		// Journal rank column: re-grade rows after editing the list / threshold,
+		// or drop the cached OpenAlex lookups.
+		let rankStatus = $("ai-toolkit-journal-rank-status");
+		let setRankStatus = (text) => {
+			if (rankStatus) {
+				rankStatus.textContent = text;
+			}
+		};
+		let refreshRankButton = $("ai-toolkit-journal-rank-refresh");
+		if (refreshRankButton) {
+			refreshRankButton.addEventListener("click", () => {
+				Zotero.AIJournalRank.refresh();
+				setRankStatus("Re-graded.");
+			});
+		}
+		let clearRankCacheButton = $("ai-toolkit-journal-rank-clear-cache");
+		if (clearRankCacheButton) {
+			clearRankCacheButton.addEventListener("click", async () => {
+				clearRankCacheButton.disabled = true;
+				try {
+					await Zotero.AIJournalRank.clearCache();
+					setRankStatus("Cache cleared — impact factors will be looked up again.");
+				}
+				catch (e) {
+					setRankStatus("Failed: " + e);
+				}
+				finally {
+					clearRankCacheButton.disabled = false;
+				}
+			});
+		}
 	}
 
 	init();

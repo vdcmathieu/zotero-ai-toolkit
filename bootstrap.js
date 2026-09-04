@@ -10,6 +10,8 @@ var ZoteroExpandAI;
 var AISummarizer;
 var ZoteroSort;
 var ZoteroChat;
+var ZoteroJournalLists;
+var ZoteroJournalRank;
 
 const PLUGIN_ID = "zotero-ai-toolkit@vandemathieu";
 
@@ -28,12 +30,16 @@ async function startup({ id, version, rootURI }) {
 	Services.scriptloader.loadSubScript(rootURI + "src/summarizer.js");
 	Services.scriptloader.loadSubScript(rootURI + "src/sorter.js");
 	Services.scriptloader.loadSubScript(rootURI + "src/chat.js");
+	Services.scriptloader.loadSubScript(rootURI + "src/journal-lists.js");
+	Services.scriptloader.loadSubScript(rootURI + "src/journal-rank.js");
 
 	// Initialise each controller.
 	ZoteroExpand.init({ id, version, rootURI });
 	await AISummarizer.init({ id, version, rootURI });
 	ZoteroSort.init({ id, version, rootURI });
 	ZoteroChat.init({ id, version, rootURI });
+	// Registers the "Journal rank" item-tree column (no per-window wiring).
+	ZoteroJournalRank.init({ id, version, rootURI });
 
 	// One shared preference pane for the whole toolkit.
 	const paneID = await Zotero.PreferencePanes.register({
@@ -87,11 +93,16 @@ function shutdown() {
 	if (Zotero.AIChat) {
 		delete Zotero.AIChat;
 	}
+	if (ZoteroJournalRank) {
+		ZoteroJournalRank.shutdown();
+	}
 	ZoteroExpand = undefined;
 	ZoteroExpandAI = undefined;
 	AISummarizer = undefined;
 	ZoteroSort = undefined;
 	ZoteroChat = undefined;
+	ZoteroJournalLists = undefined;
+	ZoteroJournalRank = undefined;
 }
 
 function uninstall() {}

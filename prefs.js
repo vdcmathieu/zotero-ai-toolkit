@@ -36,6 +36,14 @@ pref("extensions.zotero-ai-toolkit.tagAnnotations", true);
 pref("extensions.zotero-ai-toolkit.numRecommendations", 8);
 pref("extensions.zotero-ai-toolkit.maxChars", 120000);
 
+// --- Journal rank column (FT50 / ABDC A / impact factor) ------------------
+// Look up the impact-factor proxy (OpenAlex 2-year mean citedness) online.
+pref("extensions.zotero-ai-toolkit.journalRankLookup", true);
+// Journals whose citedness is above this count as "IF > 10" (orange).
+pref("extensions.zotero-ai-toolkit.journalRankIfThreshold", "10");
+// Extra journals to treat as A journals: one name or ISSN per line.
+pref("extensions.zotero-ai-toolkit.journalRankExtraA", "");
+
 // --- Keyboard shortcuts ---------------------------------------------------
 pref("extensions.zotero-ai-toolkit.shortcutEnabled", true);
 pref("extensions.zotero-ai-toolkit.shortcutAccel", true);

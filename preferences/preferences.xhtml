@@ -268,6 +268,43 @@
 	</groupbox>
 
 	<groupbox>
+		<label><html:h2>Journal Rank Column (FT50)</html:h2></label>
+
+		<description style="opacity: 0.7;">
+			Adds a “Journal rank” column to the item list (right-click a column header to show it).
+			Each article gets a colored badge: green FT50, yellow A (ABDC 2022 A*/A or your own list
+			below), orange IF &gt; 10, red anything else. FT50 and ABDC are matched by ISSN or journal
+			name from bundled lists. The impact factor is looked up on OpenAlex (two-year mean
+			citedness, the open equivalent of the JIF), cached locally, and needs no API key.
+		</description>
+
+		<hbox align="center">
+			<checkbox id="ai-toolkit-journal-rank-lookup" native="true"
+			          label="Look up impact factors online (OpenAlex)"
+			          preference="extensions.zotero-ai-toolkit.journalRankLookup"/>
+		</hbox>
+
+		<hbox align="center">
+			<label value="Impact factor threshold:" style="min-width: 12em;"/>
+			<html:input type="text" id="ai-toolkit-journal-rank-threshold" style="width: 6em;"
+			            preference="extensions.zotero-ai-toolkit.journalRankIfThreshold"/>
+			<label value="(journals above this are orange)" style="opacity: 0.7;"/>
+		</hbox>
+
+		<vbox>
+			<label value="Extra A journals — one journal name or ISSN per line (added to the ABDC A*/A list):"/>
+			<html:textarea id="ai-toolkit-journal-rank-extra" rows="5" style="width: 95%; font-family: monospace; font-size: 0.9em;"
+			               preference="extensions.zotero-ai-toolkit.journalRankExtraA"/>
+		</vbox>
+
+		<hbox align="center">
+			<html:button id="ai-toolkit-journal-rank-refresh">Re-grade all items</html:button>
+			<html:button id="ai-toolkit-journal-rank-clear-cache">Clear impact-factor cache</html:button>
+			<description id="ai-toolkit-journal-rank-status" style="margin-left: 1em; opacity: 0.8;"/>
+		</hbox>
+	</groupbox>
+
+	<groupbox>
 		<label><html:h2>Keyboard Shortcuts</html:h2></label>
 
 		<hbox align="center">
