@@ -44,6 +44,10 @@ pref("extensions.zotero-ai-toolkit.journalRankIfThreshold", "10");
 // Extra journals to treat as A journals: one name or ISSN per line.
 pref("extensions.zotero-ai-toolkit.journalRankExtraA", "");
 
+// --- Citations column -----------------------------------------------------
+// Look up citation counts online (OpenAlex, with Crossref as a fallback).
+pref("extensions.zotero-ai-toolkit.citationsLookup", true);
+
 // --- Keyboard shortcuts ---------------------------------------------------
 pref("extensions.zotero-ai-toolkit.shortcutEnabled", true);
 pref("extensions.zotero-ai-toolkit.shortcutAccel", true);

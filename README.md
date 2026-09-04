@@ -6,8 +6,8 @@ or **OpenAI ChatGPT** — you bring your own API key and pay the provider direct
 There is no hosted service: your key is stored locally and paper text is sent only
 to the provider you choose, only when you trigger a command.
 
-It currently bundles six tools. The five AI tools share the same two API keys;
-the journal rank column needs no key at all:
+It currently bundles seven tools. The five AI tools share the same two API keys;
+the two library columns need no key at all:
 
 1. **Summarize papers** — structured, literature-review-ready child notes.
 2. **Categorize highlights** — recolor your highlights into a fixed, consistent taxonomy.
@@ -19,6 +19,8 @@ the journal rank column needs no key at all:
    follow-up questions, then save the conversation as a note.
 6. **Journal rank column (FT50 checker)** — a color-coded library column: green FT50,
    yellow ABDC A*/A, orange impact factor above 10, red anything else.
+7. **Citations column** — how often each paper has been cited, sortable, from OpenAlex
+   and Crossref.
 
 ## Features
 
@@ -115,6 +117,35 @@ not on OpenAlex are shown red; add them to the *Extra A journals* list if they d
 To refresh the bundled lists, download the ABDC JQL workbook, export the "2022 JQL" sheet as CSV
 and run `python3 scripts/build-journal-lists.py <csv>`; the FT50 list lives in that script.
 
+### Citations Column
+Right-click any column header and tick **Citations** to see how often each item has been cited.
+Sorting the column ranks a collection by impact; hovering a cell shows the source, the citations
+per year since publication, and the title that was matched.
+
+| Cell | Meaning |
+| --- | --- |
+| `1,725` | citation count |
+| `0` | the paper is indexed but has not been cited yet |
+| `-` | no record found, or no confident match |
+| `...` | lookup in progress |
+| blank | nothing to look up (no DOI and no usable title) |
+
+Items are matched by DOI first, then PMID, then an exact title match; a title match is accepted
+only when the normalised title is identical *and* the publication year is within one, so a
+near-miss shows `-` rather than someone else's number. Counts come from
+[OpenAlex](https://openalex.org) (`cited_by_count`), falling back to
+[Crossref](https://www.crossref.org) (`is-referenced-by-count`) for DOIs OpenAlex does not have.
+Both are free and need no API key. Lookups are batched 50 DOIs per request, run lazily as rows
+scroll into view, and are cached for 30 days in your Zotero data directory
+(`zotero-ai-toolkit/citation-cache.json`). They can be turned off in the settings.
+
+**Why not Google Scholar?** Scholar has the fullest counts, but it has no API, its terms forbid
+automated queries, and it serves a CAPTCHA after a handful of them — a column that fires a lookup
+per row would lock you out of Scholar in your own browser within a single library scan. Expect
+OpenAlex to read roughly 30–50% lower than Scholar, which also counts theses, preprints and other
+non-indexed sources: *Deep learning* (LeCun et al. 2015) is 84,193 on OpenAlex, 75,945 on Crossref
+and 119,062 on Scholar. The ranking is what matters here, and it is very nearly the same.
+
 ## Installation
 
 1. Build the plugin package:
@@ -137,6 +168,7 @@ and run `python3 scripts/build-journal-lists.py <csv>`; the FT50 list lives in t
 | Suggest folder | Select item → `Cmd/Ctrl + Shift + F` or right-click → *Suggest folder (AI)* |
 | Ask a question (chat) | Select item → `Cmd/Ctrl + Shift + A` or right-click → *Ask a question (AI)* |
 | Journal rank column | Right-click a column header → *Journal rank* (no API key needed) |
+| Citations column | Right-click a column header → *Citations* (no API key needed) |
 
 Selecting a PDF attachment works too — the parent item is used. Running a command again creates
 a new note; existing notes are never modified or deleted.
@@ -176,6 +208,7 @@ Task-appropriate defaults (a single Anthropic key works out of the box; switch a
 | Look up impact factors online | on | Journal rank column queries OpenAlex for journals not on the FT50/ABDC lists |
 | Impact factor threshold | 10 | Journals above it are orange in the Journal rank column |
 | Extra A journals | empty | One journal name or ISSN per line, treated like ABDC A |
+| Look up citation counts online | on | Citations column queries OpenAlex, then Crossref |
 | Shortcuts | Cmd/Ctrl+Shift+S / +H / +F / +A | Modifiers and letters configurable (summarize / categorize / suggest folder / ask a question) |
 
 ## Security & privacy
@@ -220,6 +253,7 @@ src/sorter.js               Suggest folder — collections + recommendation popu
 src/chat.js                 Ask a question — paper-grounded chat panel (Zotero.AIChat / ZoteroChat)
 src/journal-rank.js         Journal rank column — FT50 / ABDC / OpenAlex grading (ZoteroJournalRank)
 src/journal-lists.js        Generated FT50 + ABDC A*/A lists with ISSNs (do not edit by hand)
+src/citations.js            Citations column — OpenAlex / Crossref counts (ZoteroCitations)
 scripts/build-journal-lists.py  Regenerates src/journal-lists.js from the ABDC CSV
 preferences/preferences.xhtml   Shared settings pane UI
 preferences/preferences.js      Settings pane logic (test key, prompt/category buttons)

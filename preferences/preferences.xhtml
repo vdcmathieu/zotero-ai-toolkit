@@ -305,6 +305,31 @@
 	</groupbox>
 
 	<groupbox>
+		<label><html:h2>Citations Column</html:h2></label>
+
+		<description style="opacity: 0.7;">
+			Adds a “Citations” column to the item list (right-click a column header to show it)
+			with the number of times each item has been cited. Counts come from OpenAlex, falling
+			back to Crossref, matched by DOI, then PMID, then an exact title match; they are cached
+			locally for 30 days and need no API key. Google Scholar is not used — it has no API and
+			blocks automated queries — so counts run lower than Scholar’s, which also counts theses
+			and other non-indexed sources.
+		</description>
+
+		<hbox align="center">
+			<checkbox id="ai-toolkit-citations-lookup" native="true"
+			          label="Look up citation counts online (OpenAlex / Crossref)"
+			          preference="extensions.zotero-ai-toolkit.citationsLookup"/>
+		</hbox>
+
+		<hbox align="center">
+			<html:button id="ai-toolkit-citations-refresh">Refresh column</html:button>
+			<html:button id="ai-toolkit-citations-clear-cache">Clear citation cache</html:button>
+			<description id="ai-toolkit-citations-status" style="margin-left: 1em; opacity: 0.8;"/>
+		</hbox>
+	</groupbox>
+
+	<groupbox>
 		<label><html:h2>Keyboard Shortcuts</html:h2></label>
 
 		<hbox align="center">

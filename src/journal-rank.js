@@ -365,6 +365,9 @@ ZoteroJournalRank = {
 		const xhr = await Zotero.HTTP.request("GET", this.OPENALEX_URL + "?" + query, {
 			responseType: "json",
 			timeout: 20000,
+			// Fail fast: Zotero would otherwise retry 5xx for up to an hour,
+			// stalling the queue. _failed handles the retry an hour later.
+			errorDelayMax: 0,
 		});
 		const data = xhr.response || {};
 		return Array.isArray(data.results) ? data.results : [];

@@ -140,6 +140,39 @@
 				}
 			});
 		}
+
+		// Citations column: re-read the rows, or drop the cached counts so they
+		// are looked up again.
+		let citeStatus = $("ai-toolkit-citations-status");
+		let setCiteStatus = (text) => {
+			if (citeStatus) {
+				citeStatus.textContent = text;
+			}
+		};
+		let refreshCiteButton = $("ai-toolkit-citations-refresh");
+		if (refreshCiteButton) {
+			refreshCiteButton.addEventListener("click", () => {
+				Zotero.AICitations.refresh();
+				let n = Zotero.AICitations.cacheSize();
+				setCiteStatus("Refreshed — " + n + " count" + (n === 1 ? "" : "s") + " cached.");
+			});
+		}
+		let clearCiteCacheButton = $("ai-toolkit-citations-clear-cache");
+		if (clearCiteCacheButton) {
+			clearCiteCacheButton.addEventListener("click", async () => {
+				clearCiteCacheButton.disabled = true;
+				try {
+					await Zotero.AICitations.clearCache();
+					setCiteStatus("Cache cleared — citation counts will be looked up again.");
+				}
+				catch (e) {
+					setCiteStatus("Failed: " + e);
+				}
+				finally {
+					clearCiteCacheButton.disabled = false;
+				}
+			});
+		}
 	}
 
 	init();
