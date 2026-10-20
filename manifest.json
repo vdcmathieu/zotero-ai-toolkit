@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Zotero AI Toolkit",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "A growing toolkit of AI features for Zotero: summarize papers, categorize highlights, find further reading, suggest folders, chat with a paper using Claude or GPT, and grade journals (FT50 / ABDC A / impact factor) and show citation counts in library columns.",
   "author": "Mathieu Van de Catsije",
   "homepage_url": "https://github.com/vdcmathieu/zotero-ai-toolkit",
@@ -10,7 +10,7 @@
       "id": "zotero-ai-toolkit@vandemathieu",
       "update_url": "https://raw.githubusercontent.com/vdcmathieu/zotero-ai-toolkit/main/updates.json",
       "strict_min_version": "6.999",
-      "strict_max_version": "9.*"
+      "strict_max_version": "*"
     }
   }
 }

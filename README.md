@@ -1,6 +1,6 @@
 # Zotero AI Toolkit
 
-A [Zotero](https://www.zotero.org/) plugin (compatible with Zotero 7–9) that adds
+A [Zotero](https://www.zotero.org/) plugin (compatible with Zotero 7 and later) that adds
 a growing set of AI features to your library. It works with **Anthropic Claude**
 or **OpenAI ChatGPT** — you bring your own API key and pay the provider directly.
 There is no hosted service: your key is stored locally and paper text is sent only
